@@ -20,14 +20,16 @@ namespace UpdateWatch_Admin
             this.updates = _updates;
             this.isUpdate = false;
         }
-        public UpdateClass(Int64 _ID, string _dnsName, string _machineName, Int64 _tickCount, string _osVersion, Int64 _updateCount, List<UpdateClass> _updates)
+        public UpdateClass(Int64 _ID, string _IP, string _dnsName, string _machineName, Int64 _tickCount, string _osVersion, Int64 _updateCount, string _lastChange, List<UpdateClass> _updates)
         {
             this.ID = _ID;
+            this.IP = _IP;
             this.dnsName = _dnsName;
             this.machineName = _machineName;
             this.tickCount = _tickCount;
             this.osVersion = _osVersion;
             this.updateCount = _updateCount;
+            this.lastChange = _lastChange;
             this.updates = _updates;
             this.isUpdate = false;
         }
@@ -91,6 +93,7 @@ namespace UpdateWatch_Admin
 
         // isUpdate = false => Host
         public Int64 ID { get; set; }
+        public string IP { get; set; }
         public string dnsName { get; set; }
         private string _machineName;
         public string machineName
@@ -114,6 +117,7 @@ namespace UpdateWatch_Admin
         public Int64 tickCount { get; set; }
         public string osVersion { get; set; }
         public Int64 updateCount { get; set; }
+        public string lastChange { get; set; }
         public List<UpdateClass> updates { get; set; }
 
         // isUpdate = true => Update
