@@ -20,7 +20,7 @@ namespace UpdateWatch_Admin
             this.updates = _updates;
             this.isUpdate = false;
         }
-        public UpdateClass(Int64 _ID, string _IP, string _dnsName, string _machineName, Int64 _tickCount, string _osVersion, Int64 _updateCount, string _lastChange, List<UpdateClass> _updates)
+        public UpdateClass(Int64 _ID, string _IP, string _dnsName, string _machineName, Int64 _tickCount, string _osVersion, Int64 _updateCount, string _lastChange, Int64 _lastChangeDays, List<UpdateClass> _updates)
         {
             this.ID = _ID;
             this.IP = _IP;
@@ -30,6 +30,7 @@ namespace UpdateWatch_Admin
             this.osVersion = _osVersion;
             this.updateCount = _updateCount;
             this.lastChange = _lastChange;
+            this.lastChangeDays = _lastChangeDays;
             this.updates = _updates;
             this.isUpdate = false;
         }
@@ -118,6 +119,7 @@ namespace UpdateWatch_Admin
         public string osVersion { get; set; }
         public Int64 updateCount { get; set; }
         public string lastChange { get; set; }
+        public Int64 lastChangeDays { get; set; }
         public List<UpdateClass> updates { get; set; }
 
         // isUpdate = true => Update

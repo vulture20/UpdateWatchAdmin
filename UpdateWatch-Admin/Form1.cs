@@ -54,17 +54,17 @@ namespace UpdateWatch_Admin
                 sqlConnection.ConnectionString = "Data Source=" + dbFilename;
                 sqlConnection.ParseViaFramework = true;
                 sqlConnection.Open();
-                command.CommandText = "SELECT * FROM Hosts";
+                command.CommandText = "SELECT *, cast(round(julianday('now') - julianday(lastChange)) as INTEGER) as lastChangeDays FROM Hosts";
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     string _dnsName = (string)reader["dnsName"], _machineName = (string)reader["machineName"], _osVersion = (string)reader["osVersion"],
                         _IP = (string)reader["IP"];
                     long _tickCount = (long)reader["tickCount"];
-                    Int64 _updateCount = (Int64)reader["updateCount"], _ID = (Int64)reader["ID"];
+                    Int64 _updateCount = (Int64)reader["updateCount"], _ID = (Int64)reader["ID"], _lastChangeDays = (Int64)reader["lastChangeDays"];
                     DateTime _lastChange = (DateTime)reader["lastChange"];
 
-                    UpdateClass host = new UpdateClass(_ID, _IP, _dnsName, _machineName, _tickCount, _osVersion, _updateCount, _lastChange.ToString(), new List<UpdateClass>());
+                    UpdateClass host = new UpdateClass(_ID, _IP, _dnsName, _machineName, _tickCount, _osVersion, _updateCount, _lastChange.ToString(), _lastChangeDays, new List<UpdateClass>());
                     
                     SQLiteCommand subcommand = new SQLiteCommand(sqlConnection);
                     subcommand.CommandText = "SELECT * FROM Updates JOIN HostUpdates ON Updates.ID=HostUpdates.UpdateID WHERE HostUpdates.HostID='" + _ID + "'";
@@ -130,6 +130,7 @@ namespace UpdateWatch_Admin
                         textBox4.Text = update.updateCount.ToString();
                         textBox5.Text = update.osVersion;
                         textBox6.Text = update.lastChange;
+                        textBox18.Text = update.lastChangeDays.ToString();
                         textBox7.Text = update.IP;
                     }
                     else
@@ -185,6 +186,14 @@ namespace UpdateWatch_Admin
                 System.Diagnostics.Process.Start(textBox11.Text);
             }
             catch (Exception ex) { }
+        }
+
+        private void treeListView1_FormatCell(object sender, BrightIdeasSoftware.FormatCellEventArgs e)
+        {
+            UpdateClass update = (UpdateClass)e.Model;
+
+            if (update.lastChangeDays >= 3)
+                e.Item.ForeColor = Color.Red;
         }
     }
 }
