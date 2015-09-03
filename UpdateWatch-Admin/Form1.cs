@@ -195,5 +195,11 @@ namespace UpdateWatch_Admin
             if (update.lastChangeDays >= 3)
                 e.Item.ForeColor = Color.Red;
         }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            AboutBox1 frmAbout = new AboutBox1();
+            frmAbout.Show();
+        }
     }
 }
