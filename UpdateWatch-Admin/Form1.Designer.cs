@@ -35,6 +35,8 @@
             this.dateiToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.vonWSUSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dBNeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.beendenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hilfeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -114,6 +116,8 @@
             this.dateiToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.dBÖffnenToolStripMenuItem,
             this.dBNeToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.toolStripMenuItem1,
             this.toolStripSeparator1,
             this.beendenToolStripMenuItem});
             this.dateiToolStripMenuItem.Name = "dateiToolStripMenuItem";
@@ -126,7 +130,7 @@
             this.dateiToolStripMenuItem1,
             this.vonWSUSToolStripMenuItem});
             this.dBÖffnenToolStripMenuItem.Name = "dBÖffnenToolStripMenuItem";
-            this.dBÖffnenToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.dBÖffnenToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.dBÖffnenToolStripMenuItem.Text = "DB ö&ffnen";
             // 
             // dateiToolStripMenuItem1
@@ -147,19 +151,33 @@
             // 
             this.dBNeToolStripMenuItem.Enabled = false;
             this.dBNeToolStripMenuItem.Name = "dBNeToolStripMenuItem";
-            this.dBNeToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
-            this.dBNeToolStripMenuItem.Text = "DB &neu einlesen";
+            this.dBNeToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.dBNeToolStripMenuItem.Text = "DB &neu einlesen (F5)";
             this.dBNeToolStripMenuItem.Click += new System.EventHandler(this.dBNeToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(229, 6);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Checked = true;
+            this.toolStripMenuItem1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(232, 22);
+            this.toolStripMenuItem1.Text = "Defender Updates ausblenden";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(155, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(229, 6);
             // 
             // beendenToolStripMenuItem
             // 
             this.beendenToolStripMenuItem.Name = "beendenToolStripMenuItem";
-            this.beendenToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.beendenToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.beendenToolStripMenuItem.Text = "&Beenden";
             this.beendenToolStripMenuItem.Click += new System.EventHandler(this.beendenToolStripMenuItem_Click);
             // 
@@ -178,6 +196,7 @@
             this.datenbankBereinigenToolStripMenuItem.Name = "datenbankBereinigenToolStripMenuItem";
             this.datenbankBereinigenToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.datenbankBereinigenToolStripMenuItem.Text = "&Datenbank bereinigen";
+            this.datenbankBereinigenToolStripMenuItem.Click += new System.EventHandler(this.datenbankBereinigenToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -791,6 +810,8 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.TextBox textBox18;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }
 

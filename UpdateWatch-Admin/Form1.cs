@@ -22,6 +22,17 @@ namespace UpdateWatch_Admin
             InitializeComponent();
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.F5:
+                    loadDB(dbFile);
+                    return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             this.treeListView1.CanExpandGetter = delegate(object x)
@@ -43,6 +54,17 @@ namespace UpdateWatch_Admin
 
         private void loadDB(string dbFilename)
         {
+            String showDefender = "";
+
+            if (toolStripMenuItem1.Checked)
+            {
+                showDefender = " AND Title NOT REGEXP '(^Update für Windows Defender Antivirus-Antischadsoftwareplattform|^Definitionsupdate für Windows Defender Antivirus)'";
+            }
+            else
+            {
+                showDefender = "";
+            }
+
             if (sqlConnection.State != ConnectionState.Closed)
                 sqlConnection.Close();
             updateList.Clear();
@@ -51,9 +73,11 @@ namespace UpdateWatch_Admin
 
             try
             {
+                RegExSQLiteFunction sqliteFunction = new RegExSQLiteFunction();
                 sqlConnection.ConnectionString = "Data Source=" + dbFilename;
                 sqlConnection.ParseViaFramework = true;
                 sqlConnection.Open();
+                sqlConnection.BindFunction(sqliteFunction.GetType().GetCustomAttributes(typeof(SQLiteFunctionAttribute), true).Cast<SQLiteFunctionAttribute>().ToArray()[0], sqliteFunction);
                 command.CommandText = "SELECT *, cast(round(julianday('now') - julianday(lastChange)) as INTEGER) as lastChangeDays FROM Hosts";
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -67,8 +91,12 @@ namespace UpdateWatch_Admin
                     UpdateClass host = new UpdateClass(_ID, _IP, _dnsName, _machineName, _tickCount, _osVersion, _updateCount, _lastChange.ToString(), _lastChangeDays, new List<UpdateClass>());
                     
                     SQLiteCommand subcommand = new SQLiteCommand(sqlConnection);
-                    subcommand.CommandText = "SELECT * FROM Updates JOIN HostUpdates ON Updates.ID=HostUpdates.UpdateID WHERE HostUpdates.HostID='" + _ID + "'";
+                    subcommand.CommandText = "SELECT * FROM Updates JOIN HostUpdates ON Updates.ID=HostUpdates.UpdateID WHERE HostUpdates.HostID='" + _ID + "'" + showDefender;
                     SQLiteDataReader subreader = subcommand.ExecuteReader();
+                    if (toolStripMenuItem1.Checked)
+                    {
+                        host.updateCount = subreader.StepCount;
+                    }
                     while (subreader.Read())
                     {
                         string _Title = (string)subreader["Title"], _Description = (string)subreader["Description"], _ReleaseNotes = (string)subreader["ReleaseNotes"],
@@ -96,7 +124,7 @@ namespace UpdateWatch_Admin
 
         private void vonWSUSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dbFile = "\\\\WSUS\\C$\\Program Files (x86)\\UpdateWatch-Server\\UpdateWatch.sqlite";
+            dbFile = "\\\\UpdateWatch.akafoe.de\\C$\\Program Files (x86)\\UpdateWatch-Server\\UpdateWatch.sqlite";
             loadDB(dbFile);
         }
 
@@ -200,6 +228,62 @@ namespace UpdateWatch_Admin
         {
             AboutBox1 frmAbout = new AboutBox1();
             frmAbout.Show();
+        }
+
+        private void datenbankBereinigenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int affectedRows = 0;
+
+            if (sqlConnection.State != ConnectionState.Closed)
+                sqlConnection.Close();
+            updateList.Clear();
+
+            SQLiteCommand command = new SQLiteCommand(sqlConnection);
+
+            try
+            {
+                sqlConnection.ConnectionString = "Data Source=" + dbFile;
+                sqlConnection.ParseViaFramework = true;
+                sqlConnection.Open();
+                command.CommandText = "BEGIN;";
+                command.ExecuteNonQuery();
+
+                // Hosts samt Updates löschen, deren Einträge älter gleich 3 Tage sind
+                command.CommandText = "DELETE FROM Updates WHERE Updates.ID IN (SELECT Updates.ID FROM Updates LEFT JOIN (SELECT * FROM HostUpdates	INNER JOIN (SELECT ID, lastchange, cast(round(julianday('now') - julianday(lastChange)) AS INTEGER) as lastChangeDays FROM Hosts WHERE lastChangeDays>=3) last ON (last.ID = HostUpdates.HostID)) upd2 ON (Updates.ID = upd2.UpdateID)	WHERE (upd2.UpdateID IS NOT NULL))";
+                affectedRows += command.ExecuteNonQuery();
+                command.CommandText = "DELETE FROM HostUpdates WHERE HostUpdates.HostID IN (SELECT HostUpdates.HostID FROM HostUpdates INNER JOIN (SELECT ID, lastchange, cast(round(julianday('now') - julianday(lastChange)) AS INTEGER) as lastChangeDays FROM Hosts	WHERE lastChangeDays>=3) last ON (last.ID = HostUpdates.HostID))";
+                affectedRows += command.ExecuteNonQuery();
+                command.CommandText = "DELETE FROM Hosts WHERE ID IN (SELECT ID	FROM (SELECT ID, lastchange, cast(round(julianday('now') - julianday(lastChange)) AS INTEGER) as lastChangeDays	FROM Hosts WHERE lastChangeDays>=3))";
+                affectedRows += command.ExecuteNonQuery();
+
+                // UpdateID-Zuordnungen löschen, deren Host es nicht mehr gibt
+                command.CommandText = "DELETE FROM HostUpdates WHERE HostUpdates.UpdateID IN (SELECT UpdateID FROM HostUpdates LEFT OUTER JOIN Hosts ON (HostUpdates.HostID = Hosts.ID) WHERE Hosts.ID IS NULL)";
+                affectedRows += command.ExecuteNonQuery();
+
+                // Updates löschen, die keinem Host mehr zugeordnet sind
+                command.CommandText = "DELETE FROM Updates WHERE Updates.ID IN (SELECT ID FROM Updates LEFT OUTER JOIN HostUpdates ON (Updates.ID = HostUpdates.UpdateID) WHERE HostUpdates.UpdateID IS NULL)";
+                affectedRows += command.ExecuteNonQuery();
+
+                // Anzahl der Updates der Hosts aktualisieren
+                command.CommandText = "UPDATE Hosts SET updateCount = (SELECT count(HostID) AS count FROM HostUpdates WHERE HostUpdates.HostID = Hosts.ID)";
+                affectedRows += command.ExecuteNonQuery();
+
+                command.CommandText = "END;";
+                command.ExecuteNonQuery();
+                command.Dispose();
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show("Fehler: Konnte Datenbank nicht öffnen bzw. bearbeiten!\n(" + ex.Message + ")");
+            }
+
+            loadDB(dbFile);
+            MessageBox.Show("Bearbeitete Datensätze: " + affectedRows.ToString());
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            toolStripMenuItem1.Checked = !toolStripMenuItem1.Checked;
         }
     }
 }
