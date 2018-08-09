@@ -82,6 +82,8 @@ namespace UpdateWatch_Admin
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
+                    int count = 0;
+
                     string _dnsName = (string)reader["dnsName"], _machineName = (string)reader["machineName"], _osVersion = (string)reader["osVersion"],
                         _IP = (string)reader["IP"];
                     long _tickCount = (long)reader["tickCount"];
@@ -93,10 +95,6 @@ namespace UpdateWatch_Admin
                     SQLiteCommand subcommand = new SQLiteCommand(sqlConnection);
                     subcommand.CommandText = "SELECT * FROM Updates JOIN HostUpdates ON Updates.ID=HostUpdates.UpdateID WHERE HostUpdates.HostID='" + _ID + "'" + showDefender;
                     SQLiteDataReader subreader = subcommand.ExecuteReader();
-                    if (toolStripMenuItem1.Checked)
-                    {
-                        host.updateCount = subreader.StepCount;
-                    }
                     while (subreader.Read())
                     {
                         string _Title = (string)subreader["Title"], _Description = (string)subreader["Description"], _ReleaseNotes = (string)subreader["ReleaseNotes"],
@@ -108,6 +106,12 @@ namespace UpdateWatch_Admin
                         UpdateClass update = new UpdateClass(_subID, _Description, _ReleaseNotes, _SupportURL, _Title, _UpdateID, _RevisionNumber, _isMandatory, _isUninstallable,
                             _KBArticleIDs, _MsrcSeverity, _Type);
                         host.updates.Add(update);
+
+                        count++;
+                    }
+                    if (toolStripMenuItem1.Checked)
+                    {
+                        host.updateCount = count;
                     }
                     subcommand.Dispose();
 
