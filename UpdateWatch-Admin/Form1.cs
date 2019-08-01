@@ -58,7 +58,7 @@ namespace UpdateWatch_Admin
 
             if (toolStripMenuItem1.Checked)
             {
-                showDefender = " AND Title NOT REGEXP '(^Update für Windows Defender Antivirus-Antischadsoftwareplattform|^Definitionsupdate für Windows Defender Antivirus)'";
+                showDefender = " AND Title NOT REGEXP '(^Security Intelligence-Update für Windows Defender Antivirus|^Update für Windows Defender Antivirus-Antischadsoftwareplattform|^Definitionsupdate für Windows Defender Antivirus)'";
             }
             else
             {
